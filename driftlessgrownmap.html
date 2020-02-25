@@ -1,0 +1,402 @@
+
+
+<html>
+
+<head>
+
+    <title>Member Farms Locator</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- d3 -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://sweet16farm.com/files/dg-style.css" />
+
+</head>
+
+<body>
+    <br />
+    <div class="container">
+        <form class="from-group row">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">Select County</label>
+                            <select class="form-control" id="selector-county">
+                                <option>All</option>
+                                <option>Fillmore</option>
+                                <option>Houston</option>
+                                <option>Olmsted</option>
+                                <option>Winneshiek</option>
+                                <option>Winona</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">Select Product</label>
+                            <select class="form-control" id="selector-product">
+                                <option>All</option>
+                                <option>Beef</option>
+                                <option>CSA</option>
+                                <option>Dairy</option>
+                                <option>Flowers</option>
+                                <option>Fruit</option>
+                                <option>Grains</option>
+                                <option>Hay</option>
+                                <option>Hemp</option>
+                                <option>Herbs</option>
+                                <option>Honey/Syrup</option>
+                                <option>Lamb/Goat</option>
+                                <option>Mushrooms</option>
+                                <option>Nursery Stock</option>
+                                <option>Pork</option>
+                                <option>Poultry</option>
+                                <option>Value Added</option>
+                                <option>Vegetables</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="searchButton" style="color:#FFFFFF;">.</label><br>
+                            <button id="search-btn" type="button" class="btn btn-primary" style="background-color:#4C587A; border-color: #4C587A;">Go</button>
+                            <label id="label-noresults" for="noresults" style="color: red"> No results found</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+   
+    <div align="center">
+        <div id="mapid"></div>
+    </div>
+    
+    <script>
+
+        // data
+        const memberFarms = [
+            {
+                "ID": 1,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.678144, 43.764194]
+                },
+                "properties": {
+                    "NAME": "Sweet 16 Farm",
+                    "ADDRESS1": "21215 State 16",
+                    "ADDRESS2": "Houston, MN 55943",
+                    "PHONE": "507-458-0959",
+                    "EMAIL": "sarahjoy@sweet16farm.com",
+                    "TAGLINE": "Specialty cut flowers, hops, event venue",
+                    "PRODUCTS": "Flowers, Other",
+                    "ZIPCODE": "55943",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Houston",
+                    "WEBSITE": "http://www.sweet16farm.com",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e0d849a8818570cab93b9d9/1577944218819/Copy+of+Sweet16Farm-1.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/sweet-16-farm"
+
+                }
+            },
+            {
+                "ID": 2,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.715421, 43.603684]
+                },
+                "properties": {
+                    "NAME": "Nettle Valley Farm",
+                    "ADDRESS1": "23970 County Road 19",
+                    "ADDRESS2": "Spring Grove, MN 55974",
+                    "PHONE": "",
+                    "EMAIL": "nettlevalleyfarm@gmail.com",
+                    "TAGLINE": "Pastured pork",
+                    "PRODUCTS": "Pork",
+                    "ZIPCODE": "55974",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Houston",
+                    "WEBSITE": "http://www.nettlevalleyfarm.com",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12ce0ba2cf815a65953c6c/1578290702038/Copy+of+NettleValleyFarm-1.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/nettle-valley-farm"
+                }
+            },
+            {
+                "ID": 3,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-92.493756, 44.011791]
+                },
+                "properties": {
+                    "NAME": "Pearson Organics",
+                    "ADDRESS1": "2009 11th Street SW",
+                    "ADDRESS2": "Rochester, MN 55902",
+                    "PHONE": "507-261-5098",
+                    "EMAIL": "pearsonorganics@gmail.com",
+                    "TAGLINE": "Customizable Vegetable CSA",
+                    "PRODUCTS": "Other",
+                    "ZIPCODE": "55902",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Olmsted",
+                    "WEBSITE": "https://www.pearsonorganicsfarm.com/",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12ce2f61066d7f813da1d4/1578290736764/Copy+of+PearsonOrganics-2.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/pearson-organics"
+                }
+            },
+            {
+                "ID": 4,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-92.177147, 43.836512]
+                },
+                "properties": {
+                    "NAME": "Kappers Big Red Barn",
+                    "ADDRESS1": "33218 County 5",
+                    "ADDRESS2": "Chatfield, MN 55923",
+                    "PHONE": "507-867-3556",
+                    "EMAIL": "bigredbarn507@gmail.com",
+                    "TAGLINE": "Milk, cheese curds, ice cream, home delivery service",
+                    "PRODUCTS": "Dairy",
+                    "ZIPCODE": "55923",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Fillmore",
+                    "WEBSITE": "https://www.kappersbigredbarn.com/",
+                    "IMAGE": "",
+                    "PROFILE": "https://www.driftlessgrown.com/kappers-big-red-barn"
+                }
+            },
+            {
+                "ID": 5,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.927861, 44.019585]
+                },
+                "properties": {
+                    "NAME": "Capra Nera Creamery",
+                    "ADDRESS1": "17491 Bethany Drive",
+                    "ADDRESS2": "Altura, Minnesota",
+                    "PHONE": "507-961-4523",
+                    "EMAIL": "CapraNera.KW@gmail.com",
+                    "TAGLINE": "Artisan cheese from pasture-fed goat milk",
+                    "PRODUCTS": "Dairy, Lamb/Goat",
+                    "ZIPCODE": "55910",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Winona",
+                    "WEBSITE": "https://www.facebook.com/CapraNeraCreamery/",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12cdebdbd43712f42f95fa/1578290669754/Copy+of+CapraNera-1.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/capra-nera-creamery"
+                }
+            },
+            {
+                "ID": 6,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.656513, 43.578435]
+                },
+                "properties": {
+                    "NAME": "Hidden Springs Flower Farm",
+                    "ADDRESS1": "18581 County 4",
+                    "ADDRESS2": "Spring Grove, Minnesota",
+                    "PHONE": "507-498-3020",
+                    "EMAIL": "hsffgardener@aol.com",
+                    "TAGLINE": "Nursery plants, fruit trees, cut flower peonies",
+                    "PRODUCTS": "Nursery Stock, Flowers, Fruit",
+                    "ZIPCODE": "55974",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Houston",
+                    "WEBSITE": "https://www.hiddenspringsflowerfarm.com/",
+                    "IMAGE": "",
+                    "PROFILE": "https://www.driftlessgrown.com/hidden-springs-flower-farm"
+                }
+            },
+            {
+                "ID": 7,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.680819, 43.332839]
+                },
+                "properties": {
+                    "NAME": "Humble Hands Harvest",
+                    "ADDRESS1": "2741 Hidden Falls Road",
+                    "ADDRESS2": "Decorah, IA 52101",
+                    "PHONE": "507-513-1502",
+                    "EMAIL": "humblehandsharvest@gmail.com",
+                    "TAGLINE": "Vegetables, pastured pork, grass-fed lamb",
+                    "PRODUCTS": "Pork, Lamb/Goat, Other",
+                    "ZIPCODE": "52101",
+                    "STATE": "Iowa",
+                    "COUNTY": "Winneshiek",
+                    "WEBSITE": "https://humblehandsharvest.com/",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12cdfd08c15a57c8667f78/1578290688035/Copy+of+HumbleHandsHarvest-13.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/humble-hands-harvest"
+                }
+            },
+            {
+                "ID": 8,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-92.07195, 43.674048]
+                },
+                "properties": {
+                    "NAME": "Blossom Hill Orchard and Farm",
+                    "ADDRESS1": "645 Highway 52 East",
+                    "ADDRESS2": "Preston, MN 55965",
+                    "PHONE": "507-765-4486",
+                    "EMAIL": "daneandhillary@gmail.com",
+                    "TAGLINE": "Apples, fruit, vegetables, baked goods, pastured pork, pizza farm",
+                    "PRODUCTS": "Fruit, Pork, Other",
+                    "ZIPCODE": "55965",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Fillmore",
+                    "WEBSITE": "http://www.blossomhillapples.com/",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12cdd91683ea216c9d9fc3/1578290651625/Copy+of+BlossomHill-33.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/blossom-hill-orchard-and-farm"
+                }
+            },
+            {
+                "ID": 9,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-91.696698, 43.873374]
+                },
+                "properties": {
+                    "NAME": "Owl Bluff Farm",
+                    "ADDRESS1": "12314 County Road 4",
+                    "ADDRESS2": "Houston, MN 55943",
+                    "PHONE": "",
+                    "EMAIL": "hello@owlbluff.com",
+                    "TAGLINE": "Certified organic vegetables",
+                    "PRODUCTS": "Other",
+                    "ZIPCODE": "55943",
+                    "STATE": "Minnesota",
+                    "COUNTY": "Houston",
+                    "WEBSITE": "https://www.facebook.com/Owl-Bluff-Farm-2514535488579865/",
+                    "IMAGE": "https://static1.squarespace.com/static/5df83bb33c4cd536d478e915/t/5e12ce1fa2cf815a65953df1/1578290722513/Copy+of+OwlBluff-9.jpg",
+                    "PROFILE": "https://www.driftlessgrown.com/owl-bluff-farm"
+                }
+            }
+        ]
+
+        console.log(memberFarms)
+
+        // Getting a reference to the search button
+        const searchButton = d3.select("#search-btn");
+
+        // Getting a reference to the no result found label and hiding it
+        const noresultsLabel = d3.select("#label-noresults");
+        noresultsLabel.style("display", "none");
+
+         // create map object with center locale of Sweet 16 farms
+        var mymap = L.map('mapid', { scrollWheelZoom: false }).setView([43.717882, -91.975601], 8.);
+
+        // Adding a tile layer (the background map image) to our map
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox/streets-v11'
+        }).addTo(mymap);
+
+        // Layer for the markers. Do this so we can clear out and set again after a search
+        var markersLayer = new L.LayerGroup();
+
+        // Load map with all data when page loads. default with all data
+        // populateMap(farms)
+        populateMapPoints(memberFarms)
+
+        function populateMapPoints(data) {
+            // NOTE: The first thing we do here is clear the markers from the layer.
+            markersLayer.clearLayers();
+
+            var marker;
+
+            // console.log(data.features);
+            data.forEach(farm => {
+
+                // coordinates in data are long, lat, so need to swap them to get them plotted
+                marker = L.marker([farm.geometry.coordinates[1], farm.geometry.coordinates[0]])
+                    .bindPopup("<div style='width: 247px'><div class='mobileHide'><a href=" + farm.properties.PROFILE + " target='_top'><img style='width: 240px; height: 180px;'' src=" + farm.properties.IMAGE + " ></a></div><br><div class='large'><a href=" + farm.properties.PROFILE + " target='_top' style='color:#333333;'>" + farm.properties.NAME + "</a></div><div class='tagline'>" + farm.properties.TAGLINE + "</div><br><hr style='width: 100%; height: 0.5px;'' noshade='noshade'><div style='text-align: left;'><a target='_top' href=" + farm.properties.PROFILE + " target='_top'>Learn More</a><br><br></div></div>");
+
+                markersLayer.addLayer(marker);
+            });
+
+        };
+
+
+        // NOTE: We add the markersLayer to the map here. This way, the layer is only added once.  
+        markersLayer.addTo(mymap);
+
+        // Event handler for serach button click
+        searchButton.on("click", function () {
+            // Prevent the page from refreshing
+            d3.event.preventDefault();
+
+            // Hide the no results label
+            noresultsLabel.style("display", "none");
+
+            // Get the value property of the input elements
+            const searchCounty = d3.select("#selector-county").property("value");
+            const searchProduct = d3.select("#selector-product").property("value");
+
+
+            // Create filtered data object set to current data 
+            let filteredFarms = memberFarms;
+
+            // evalute and apply each filter
+            if (searchCounty !== "All") {
+                filteredFarms = filteredFarms.filter(d => d.properties.COUNTY == searchCounty);
+            };
+            if (searchProduct !== "All") {
+                filteredFarms = filteredFarms.filter(d => d.properties.PRODUCTS.includes(searchProduct))
+            };
+
+            // if we don't have any results, show the no results text
+            if(filteredFarms.length == 0)
+            {
+                noresultsLabel.style("display", "inline-flex");
+            }
+
+            // Send filtered data to function to populate table
+            populateMapPoints(filteredFarms);
+
+        });
+
+
+
+    </script>
+
+
+    <!-- bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
